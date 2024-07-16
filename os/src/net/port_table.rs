@@ -79,11 +79,12 @@ pub fn check_accept(port: u16, tcp_packet: &TCPPacket) -> Option<()> {
             None
         } else {
             let listen_port = listen_ports[0].as_mut().unwrap();
+            let task = listen_port.schedule.clone().unwrap();
             // wakeup_task(Arc::clone(&listen_port.schedule.clone().unwrap()));
             listen_port.schedule = None;
             listen_port.receivable = false;
 
-            accept_connection(port, tcp_packet, listen_port.schedule.unwrap());
+            accept_connection(port, tcp_packet, task);
             Some(())
         }
     }

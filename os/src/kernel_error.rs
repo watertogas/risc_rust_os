@@ -4,13 +4,13 @@ use core::panic::PanicInfo;
 fn panic(info : &PanicInfo) ->!{
     if let Some(location) = info.location() {
         println! (
-            "Panicked at {}:{} {}",
+            "[Kernel]Panicked at {}:{} {}",
             location.file(),
             location.line(),
-            info.message().unwrap()
+            info.message(),
         );
     } else {
-        println! ("Panicked at {}", info.message().unwrap());
+        println! ("[Kernel]Panicked at {}", info.message());
     }
     shutdown(true);
 }

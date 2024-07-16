@@ -4,13 +4,13 @@ use super::exit;
 fn panic(info : &PanicInfo) ->!{
     if let Some(location) = info.location() {
         println! (
-            "Panicked at {}:{} {}",
+            "[User]Panicked at {}:{} {}",
             location.file(),
             location.line(),
-            info.message().unwrap()
+            info.message()
         );
     } else {
-        println! ("Panicked at {}", info.message().unwrap());
+        println! ("[User]Panicked at {}", info.message());
     }
     exit(1);
     //should never come here

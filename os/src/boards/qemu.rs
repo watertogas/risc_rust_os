@@ -7,6 +7,9 @@ use crate::println;
 
 //qemu clock frequency; which means ticks in a second
 pub const CLOCK_FREQ : usize = 12500000;
+//avaliable heap(64MB):end of kernel ~ 0x83600000
+pub const AVALIABLE_FRAMES_END : usize = 0x83600000;
+//DMA area: 10MB: 0x83600000 ~ 0x84000000
 //avaliable memrory(64MB):0x80000000 ~ 0x84000000
 pub const AVALIABLE_MEMORY_END : usize = 0x84000000;
 pub const VIRT_PLIC: usize = 0xC00_0000;
@@ -43,6 +46,9 @@ pub fn init_plic()
 
 pub fn init_qemu_devices()
 {
+    //init dma area
+    init_dma_allocator();
+    println!("init dma memory done");
     //init uart
     UART.init();
     set_mmio_uart_ready();

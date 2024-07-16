@@ -12,6 +12,7 @@ pub use input::KEYBOARD_DEVICE;
 pub use input::MOUSE_DEVICE;
 pub use net::NET_DEVICE;
 pub use bus::virtio::VirtioHal;
+pub use bus::virtio::init_dma_allocator;
 
 //this is for QEMU devices
 pub type BlockDeviceImpl = crate::drivers::block::VirtIOBlock;

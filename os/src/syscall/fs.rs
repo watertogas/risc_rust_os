@@ -65,6 +65,9 @@ pub fn syscall_dup(fd : usize) -> isize {
 }
 
 pub fn syscall_read(fd: usize, buf: *const u8, len: usize) -> isize {
+    if len == 0 {
+        return -2;
+    }
     let pid = get_current_task().to_pid();
     match find_file_by_fd(pid, fd) {
         Some(file) => {
@@ -81,6 +84,9 @@ pub fn syscall_read(fd: usize, buf: *const u8, len: usize) -> isize {
 }
 
 pub fn syscall_write(fd : usize, buf : *const u8, len : usize) ->isize {
+    if len == 0 {
+        return -2;
+    }
     let pid = get_current_task().to_pid();
     match find_file_by_fd(pid, fd) {
         Some(file) => {

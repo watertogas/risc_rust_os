@@ -1,7 +1,7 @@
 use crate::mm::address::PhysPageNum;
 use crate::mm::address::PhysAddr;
 use alloc::vec::Vec;
-use crate::board::AVALIABLE_MEMORY_END;
+use crate::board::AVALIABLE_FRAMES_END;
 use crate::mm::address::round_down_in_4k;
 use crate::common::memset_usize;
 use alloc::boxed::Box;
@@ -84,7 +84,7 @@ pub fn init_frame_allocator() {
         FRAME_ALLOCATOR = Some(Box::leak(allocator));
         FRAME_ALLOCATOR.as_mut().unwrap().init(
             PhysAddr::from(ekernel as usize).into(), 
-            PhysAddr::from(round_down_in_4k(AVALIABLE_MEMORY_END)).into());
+            PhysAddr::from(round_down_in_4k(AVALIABLE_FRAMES_END)).into());
     }   
 }
 

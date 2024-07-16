@@ -9,7 +9,7 @@ pub const KERNEL_HEAP_SIZE : usize = 0xA00000;
 pub const KERNEL_PAGE_SIZE : usize = 4096;
 pub const KERNEL_PAGE_WIDTH_BITS : usize = 12;
 
-pub use crate::board::{CLOCK_FREQ, AVALIABLE_MEMORY_END, MMIO};
+pub use crate::board::{CLOCK_FREQ, AVALIABLE_FRAMES_END, AVALIABLE_MEMORY_END, MMIO};
 
 //Dynamic configs for ALL OS
 pub struct DynamicConfigs{

@@ -1003,3 +1003,21 @@ pub fn get_syscall_return_value(task_id : TaskID) -> isize{
         }
     }
 }
+
+pub fn print_current_process_map() {
+    let (pid, tid) = get_current_task().to_pid_tid();
+    unsafe {
+        //if process is not exsited, just return
+        if !PROCESSES.as_mut().unwrap().processes.contains_key(&pid) {
+            return;
+        }
+        let process = PROCESSES.as_mut().unwrap().processes.get_mut(&pid).unwrap();
+        //process should be running
+        process.user_memorys[0].print_maps();
+        if !process.threads.contains_key(&tid){
+            return;
+        }
+        let thread = process.threads.get_mut(&tid).unwrap();
+        thread.private_mem[0].print_maps();
+    }
+}

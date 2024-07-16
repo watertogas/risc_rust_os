@@ -1,6 +1,8 @@
 //! Uniprocessor interior mutability primitives
 use core::cell::{RefCell, RefMut};
 use riscv::register::sstatus;
+use core::sync::atomic::compiler_fence;
+use core::sync::atomic::Ordering;
 
 /// Wrap a static data structure inside it so that we are
 /// able to access it without any `unsafe`.
@@ -46,6 +48,7 @@ impl InterruptMask {
             unsafe {
                 sstatus::clear_sie();
             }
+            compiler_fence(Ordering::SeqCst);
             self.int_on = true;
         } else {
             self.int_on = false;

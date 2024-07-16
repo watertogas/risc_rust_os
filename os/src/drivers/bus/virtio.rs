@@ -1,45 +1,38 @@
 
-use crate::mm::frame_allocator::frame_alloc;
-use crate::mm::frame_allocator::frame_dealloc;
 use crate::mm::page_table::kern_vaddr_to_phy_addr;
-use crate::mm::address::StepByOne;
 use crate::mm::address::PhysAddr;
-use crate::mm::address::PhysPageNum;
-use crate::mm::frame_allocator::FrameWrapper;
 use lazy_static::*;
 use virtio_drivers::Hal;
-use spin::Mutex;
-use alloc::vec::Vec;
+use crate::config::AVALIABLE_FRAMES_END;
+use crate::config::AVALIABLE_MEMORY_END;
+use crate::config::KERNEL_PAGE_SIZE;
+use buddy_system_allocator::LockedFrameAllocator;
 
 pub struct VirtioHal;
 
 lazy_static! {
-    static ref QUEUE_FRAMES: Mutex<Vec<FrameWrapper>> = Mutex::new(Vec::new());
+    static ref DMA_ALLOCATOR: LockedFrameAllocator = LockedFrameAllocator::new();
+}
+
+pub fn init_dma_allocator(){
+    let dma_start : PhysAddr = PhysAddr::from(AVALIABLE_FRAMES_END);
+    let dma_end : PhysAddr = PhysAddr::from(AVALIABLE_MEMORY_END);
+    DMA_ALLOCATOR.lock().add_frame(dma_start.0, dma_end.0);
 }
 
 impl Hal for VirtioHal {
     fn dma_alloc(pages: usize) -> usize {
-        let mut ppn_base = PhysPageNum(0);
-        for i in 0..pages {
-            let frame = frame_alloc().unwrap();
-            if i == 0 {
-                ppn_base = frame.ppn;
-            }
-            assert_eq!(frame.ppn.0, ppn_base.0 + i);
-            //println!("allocated frame ppn=0x{:x}", frame.ppn.0);
-            QUEUE_FRAMES.lock().push(frame);
+        let total_size = pages * KERNEL_PAGE_SIZE;
+        if let Some(phys_addr) = DMA_ALLOCATOR.lock().alloc(total_size) {
+            phys_addr
+        } else {
+            panic!("Can not alloc memory for pages: {}", pages);
         }
-        let pa: PhysAddr = ppn_base.into();
-        pa.0
     }
 
     fn dma_dealloc(pa: usize, pages: usize) -> i32 {
-        let pa = PhysAddr::from(pa);
-        let mut ppn_base: PhysPageNum = pa.into();
-        for _ in 0..pages {
-            frame_dealloc(ppn_base);
-            ppn_base.step();
-        }
+        let total_size = pages * KERNEL_PAGE_SIZE;
+        DMA_ALLOCATOR.lock().dealloc(pa, total_size);
         0
     }
     //now vaddr == paddr in kernel
